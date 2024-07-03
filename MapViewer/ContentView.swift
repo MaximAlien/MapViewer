@@ -23,7 +23,7 @@ struct ContentView: View {
     var locationManager = LocationManager()
 
     @State
-    var coordinates: [[CLLocationCoordinate2D]] = []
+    var trails: [Trail] = []
 
     @State
     var shouldShowfileImporter = false
@@ -37,6 +37,9 @@ struct ContentView: View {
     @State
     private var selection: Int?
 
+    @State
+    var currentTapCoordinate: CLLocationCoordinate2D? = nil
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             MapReader { mapReader in
@@ -44,24 +47,10 @@ struct ContentView: View {
                     position: $position,
                     selection: $selection
                 ) {
-                    //            ForEach(GPXParser().polylines(for: [
-                    //                "Bristlecone Pine Glacier Trail"
-                    //            ]), id:\.self) { coordinates in
-                    //                MapPolyline(coordinates: coordinates)
-                    //                    .stroke(.blue.opacity(1.0), lineWidth: 3)
-                    //                    .foregroundStyle(.purple.opacity(0.7))
-                    //            }
-
-                    ForEach(coordinates, id:\.self) { coordinates in
-                        MapPolyline(coordinates: coordinates)
-                            .stroke(.blue.opacity(1.0), lineWidth: 3)
+                    ForEach(trails, id: \.id) { trail in
+                        MapPolyline(coordinates: trail.coordinates)
+                            .stroke(trail.isSelected ? .green.opacity(1.0) : .blue.opacity(1.0), lineWidth: 3)
                             .foregroundStyle(.purple.opacity(0.7))
-                            .tag(1)
-
-//                        Marker(coordinate: coordinates.first!) {
-//                            Image(systemName: "mappin")
-//                        }
-//                        .tag(1)
                     }
                 }
                 .mapControls {
@@ -84,15 +73,19 @@ struct ContentView: View {
                 ) { result in
                     switch result {
                     case .success(let urls):
-                        var newCoordinates: [[CLLocationCoordinate2D]] = []
-                        var dataArray: [Data] = []
+                        var newTrails: [Trail] = []
                         urls.forEach { url in
                             do {
                                 if url.startAccessingSecurityScopedResource() {
                                     let data = try Data(contentsOf: url, options: .alwaysMapped)
-                                    newCoordinates.append(GPXParser().polyline(from: data))
-
-                                    dataArray.append(data)
+                                    newTrails.append(
+                                        Trail(
+                                            name: url.lastPathComponent.replacing(".gpx", with: ""),
+                                            coordinates: GPXParser().polyline(
+                                                from: data
+                                            )
+                                        )
+                                    )
                                 }
                             } catch {
                                 shouldShowAlert = true
@@ -100,31 +93,124 @@ struct ContentView: View {
                             }
                         }
 
-                        UserDefaults.standard.setValue(dataArray, forKey: UserDefaults.coordinatesKey)
-                        coordinates = newCoordinates
+                        do {
+                            let newTrailsData = try JSONEncoder().encode(newTrails)
+                            UserDefaults.standard.set(newTrailsData, forKey: UserDefaults.coordinatesKey)
+                            trails = newTrails
+                        } catch {
+                            shouldShowAlert = true
+                            alertMessage = error.localizedDescription
+                        }
 
-                        break
+                        // TODO: Add camera change to fit all trails.
                     case .failure(let error):
                         shouldShowAlert = true
                         alertMessage = error.localizedDescription
                     }
                 }
-//                .onTapGesture(perform: { screenCoordinate in
-//                    let tapLocation = mapReader.convert(screenCoordinate, from: .local)
-//                    print(tapLocation)
-//                })
-//                .onChange(of: selection) {
-//                    print("selection changed:", selection)
-//                }
+                .onTapGesture(perform: {
+                    screenCoordinate in
+                    guard let tapLocation = mapReader.convert(screenCoordinate, from: .local) else {
+                        return
+                    }
+
+                    let trailsSortedByClosestDistanceToTap = trails.sorted(by: { firstTrail, secondTrail in
+                        let firstTrailMinimumDistance = firstTrail.coordinates.map {
+                            CLLocation(
+                                latitude: $0.latitude,
+                                longitude: $0.longitude
+                            ).distance(
+                                from: CLLocation(
+                                    latitude: tapLocation.latitude,
+                                    longitude: tapLocation.longitude
+                                )
+                            )
+                        }.min() ?? .greatestFiniteMagnitude
+
+                        let secondTrailMinimumDistance = secondTrail.coordinates.map {
+                            CLLocation(
+                                latitude: $0.latitude,
+                                longitude: $0.longitude
+                            ).distance(
+                                from: CLLocation(
+                                    latitude: tapLocation.latitude,
+                                    longitude: tapLocation.longitude
+                                )
+                            )
+                        }.min() ?? .greatestFiniteMagnitude
+
+                        return firstTrailMinimumDistance < secondTrailMinimumDistance
+                    })
+
+                    var newTrails: [Trail] = []
+                    for trail in trails {
+                        newTrails.append(
+                            Trail(
+                                name: trail.name,
+                                coordinates: trail.coordinates,
+                                isSelected: trail.id == trailsSortedByClosestDistanceToTap.first?.id
+                            )
+                        )
+                    }
+
+                    guard let closestTrail = trailsSortedByClosestDistanceToTap.first else {
+                        return
+                    }
+
+                    let minimumDistanceToClosestTrail = closestTrail.coordinates.map {
+                        CLLocation(
+                            latitude: $0.latitude,
+                            longitude: $0.longitude
+                        ).distance(
+                            from: CLLocation(
+                                latitude: tapLocation.latitude,
+                                longitude: tapLocation.longitude
+                            )
+                        )
+                    }.min() ?? .greatestFiniteMagnitude
+
+                    if minimumDistanceToClosestTrail > 100.0 {
+                        return
+                    }
+
+                    shouldShowAlert = true
+
+                    let coordinatesOfClosestTrail = trailsSortedByClosestDistanceToTap.first?.coordinates ?? []
+                    let closestTrailDistance = zip(coordinatesOfClosestTrail.dropFirst(), coordinatesOfClosestTrail).map { (c, d) in
+                        let distance = CLLocation(
+                            latitude: c.latitude,
+                            longitude: c.longitude
+                        ).distance(
+                            from: CLLocation(
+                                latitude: d.latitude,
+                                longitude: d.longitude
+                            )
+                        )
+
+                        return distance
+                    }.reduce(0.0, +)
+
+                    let formattedDistance = String(format: "%.2f", closestTrailDistance / 1000.0)
+                    alertMessage = "Distance of \(closestTrail.name): \(formattedDistance) km"
+
+                    let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+                    impactFeedbackGenerator.impactOccurred()
+
+                    currentTapCoordinate = tapLocation
+                    trails = newTrails
+                })
+                // .onChange(of: selection) {
+                //     print("Selection changed: \(selection)")
+                // }
             }
 
             Menu {
                 Button("Remove all", systemImage: "trash") {
-                    UserDefaults.standard.setValue(nil, forKey: UserDefaults.coordinatesKey)
+                    UserDefaults.standard.set(nil, forKey: UserDefaults.coordinatesKey)
                     UserDefaults.standard.synchronize()
-                    coordinates = []
+                    trails = []
                 }
-                .disabled(UserDefaults.standard.object(forKey: UserDefaults.coordinatesKey) == nil)
+                .disabled(UserDefaults.standard.data(forKey: UserDefaults.coordinatesKey) == nil)
 
                 Button("Add GPX", systemImage: "point.topleft.down.to.point.bottomright.curvepath.fill") {
                     shouldShowfileImporter = true
@@ -140,10 +226,15 @@ struct ContentView: View {
             }
         }
         .onAppear {
-            if let savedCoordinates = UserDefaults.standard.object(forKey: UserDefaults.coordinatesKey) as? [Data] {
-                savedCoordinates.forEach { data in
-                    coordinates.append(GPXParser().polyline(from: data))
+            do {
+                if let trailsData = UserDefaults.standard.data(forKey: UserDefaults.coordinatesKey) {
+                    trails = try JSONDecoder().decode([Trail].self, from: trailsData)
+                } else {
+                    print("Trails data not available")
                 }
+            } catch {
+                shouldShowAlert = true
+                alertMessage = error.localizedDescription
             }
         }
         .alert(alertMessage, isPresented: $shouldShowAlert) {
