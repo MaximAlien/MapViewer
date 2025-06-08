@@ -11,7 +11,9 @@ import SwiftUI
 
 class GPXParser: NSObject, XMLParserDelegate {
 
-    private var coordinates = [CLLocationCoordinate2D]()
+    var coordinates = [CLLocationCoordinate2D]()
+
+    var ranking: Int?
 
     func polylines(for fileNames: [String]) -> [[CLLocationCoordinate2D]] {
         var allCoordinates: [[CLLocationCoordinate2D]] = []
@@ -37,8 +39,9 @@ class GPXParser: NSObject, XMLParserDelegate {
         return allCoordinates
     }
 
-    func polyline(from data: Data) -> [CLLocationCoordinate2D] {
+    func parse(from data: Data) {
         coordinates.removeAll()
+        ranking = nil
 
         let parser = XMLParser(data: data)
         parser.delegate = self
@@ -46,8 +49,6 @@ class GPXParser: NSObject, XMLParserDelegate {
         if !parser.parse() {
             print("Failed to parse")
         }
-
-        return coordinates
     }
 
     func parser(
@@ -57,6 +58,9 @@ class GPXParser: NSObject, XMLParserDelegate {
         qualifiedName qName: String?,
         attributes attributeDict: [String: String] = [:]
     ) {
+        if elementName == "ranking", let value = attributeDict["value"] {
+            ranking = Int(value)
+        }
         if elementName == "trkpt" /* || elementName == "wpt" */ {
             let latitude = CLLocationDegrees(attributeDict["lat"]!)!
             let longitude = CLLocationDegrees(attributeDict["lon"]!)!

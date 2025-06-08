@@ -18,16 +18,20 @@ struct Trail: Identifiable, Codable {
 
     let isSelected: Bool
 
+    let ranking: Int?
+
     init(
         id: UUID = UUID(),
         name: String,
         coordinates: [CLLocationCoordinate2D],
-        isSelected: Bool = false
+        isSelected: Bool = false,
+        ranking: Int? = nil
     ) {
         self.id = id
         self.name = name
         self.coordinates = coordinates
         self.isSelected = isSelected
+        self.ranking = ranking
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -36,6 +40,7 @@ struct Trail: Identifiable, Codable {
         try container.encode(name)
         try container.encode(coordinates)
         try container.encode(isSelected)
+        try container.encode(ranking)
     }
 
     init(from decoder: Decoder) throws {
@@ -44,5 +49,6 @@ struct Trail: Identifiable, Codable {
         name = try container.decode(String.self)
         coordinates = try container.decode([CLLocationCoordinate2D].self)
         isSelected = try container.decode(Bool.self)
+        ranking = try container.decodeIfPresent(Int.self)
     }
 }

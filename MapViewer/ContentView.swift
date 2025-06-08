@@ -40,22 +40,40 @@ struct ContentView: View {
     @State
     var currentTapCoordinate: CLLocationCoordinate2D? = nil
 
+    @Namespace
+    var mapScope
+
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
             MapReader { mapReader in
                 Map(
                     position: $position,
-                    selection: $selection
+                    selection: $selection,
+                    scope: mapScope
                 ) {
                     ForEach(trails, id: \.id) { trail in
                         MapPolyline(coordinates: trail.coordinates)
                             .stroke(trail.isSelected ? .green.opacity(1.0) : .blue.opacity(1.0), lineWidth: 3)
                             .foregroundStyle(.purple.opacity(0.7))
+
+                        if let trailhead = trail.coordinates.first {
+                            Marker(coordinate: trailhead) {
+                                VStack {
+                                    if let trailRanking = trail.ranking {
+                                        Text("\(trailRanking). \(trail.name)")
+                                            .font(.caption)
+                                    } else {
+                                        Text(trail.name)
+                                            .font(.caption)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 .mapControls {
-                    MapUserLocationButton()
-                        .buttonBorderShape(.circle)
+                    MapUserLocationButton(scope: mapScope)
+                        .buttonBorderShape(.capsule)
 
                     MapCompass()
 
@@ -78,12 +96,13 @@ struct ContentView: View {
                             do {
                                 if url.startAccessingSecurityScopedResource() {
                                     let data = try Data(contentsOf: url, options: .alwaysMapped)
+                                    let parser = GPXParser()
+                                    parser.parse(from: data)
                                     newTrails.append(
                                         Trail(
                                             name: url.lastPathComponent.replacing(".gpx", with: ""),
-                                            coordinates: GPXParser().polyline(
-                                                from: data
-                                            )
+                                            coordinates: parser.coordinates,
+                                            ranking: parser.ranking
                                         )
                                     )
                                 }
@@ -102,14 +121,40 @@ struct ContentView: View {
                             alertMessage = error.localizedDescription
                         }
 
-                        // TODO: Add camera change to fit all trails.
+                        let latitudes = trails.flatMap({ $0.coordinates }).map({ $0.latitude })
+                        let longitudes = trails.flatMap({ $0.coordinates }).map({ $0.longitude })
+
+                        let north = latitudes.max()!
+                        let south = latitudes.min()!
+                        let west = longitudes.min()!
+                        let east = longitudes.max()!
+
+                        let northWest = CLLocationCoordinate2D(latitude: north, longitude: west)
+                        let southEast = CLLocationCoordinate2D(latitude: south, longitude: east)
+
+                        let centerCoordinate = CLLocationCoordinate2D(
+                            latitude: (northWest.latitude + southEast.latitude) / 2,
+                            longitude: (northWest.longitude + southEast.longitude) / 2
+                        )
+
+                        let latitudeDelta = north - south
+                        let longitudeDelta = east - west
+
+                        position = .region(
+                            MKCoordinateRegion(
+                                center: centerCoordinate,
+                                span: MKCoordinateSpan(
+                                    latitudeDelta: latitudeDelta + 0.1,
+                                    longitudeDelta: longitudeDelta + 0.1
+                                )
+                            )
+                        )
                     case .failure(let error):
                         shouldShowAlert = true
                         alertMessage = error.localizedDescription
                     }
                 }
-                .onTapGesture(perform: {
-                    screenCoordinate in
+                .onTapGesture(perform: { screenCoordinate in
                     guard let tapLocation = mapReader.convert(screenCoordinate, from: .local) else {
                         return
                     }
@@ -148,7 +193,8 @@ struct ContentView: View {
                             Trail(
                                 name: trail.name,
                                 coordinates: trail.coordinates,
-                                isSelected: trail.id == trailsSortedByClosestDistanceToTap.first?.id
+                                isSelected: trail.id == trailsSortedByClosestDistanceToTap.first?.id,
+                                ranking: trail.ranking
                             )
                         )
                     }
@@ -193,11 +239,11 @@ struct ContentView: View {
                     let formattedDistance = String(format: "%.2f", closestTrailDistance / 1000.0)
                     alertMessage = "Distance of \(closestTrail.name): \(formattedDistance) km"
 
-                    let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
-                    impactFeedbackGenerator.impactOccurred()
-
                     currentTapCoordinate = tapLocation
                     trails = newTrails
+
+                    let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
+                    impactFeedbackGenerator.impactOccurred()
                 })
                 // .onChange(of: selection) {
                 //     print("Selection changed: \(selection)")
@@ -229,6 +275,39 @@ struct ContentView: View {
             do {
                 if let trailsData = UserDefaults.standard.data(forKey: UserDefaults.coordinatesKey) {
                     trails = try JSONDecoder().decode([Trail].self, from: trailsData)
+
+                    Task {
+                        try await Task.sleep(for: .seconds(0.1))
+
+                        let latitudes = trails.flatMap({ $0.coordinates }).map({ $0.latitude })
+                        let longitudes = trails.flatMap({ $0.coordinates }).map({ $0.longitude })
+
+                        let south = latitudes.min()!
+                        let north = latitudes.max()!
+                        let west = longitudes.min()!
+                        let east = longitudes.max()!
+
+                        let northWest = CLLocationCoordinate2D(latitude: north, longitude: west)
+                        let southEast = CLLocationCoordinate2D(latitude: south, longitude: east)
+
+                        let centerCoordinate = CLLocationCoordinate2D(
+                            latitude: (northWest.latitude + southEast.latitude) / 2,
+                            longitude: (northWest.longitude + southEast.longitude) / 2
+                        )
+
+                        let latitudeDelta = north - south
+                        let longitudeDelta = east - west
+
+                        position = .region(
+                            MKCoordinateRegion(
+                                center: centerCoordinate,
+                                span: MKCoordinateSpan(
+                                    latitudeDelta: latitudeDelta + 0.1,
+                                    longitudeDelta: longitudeDelta + 0.1
+                                )
+                            )
+                        )
+                    }
                 } else {
                     print("Trails data not available")
                 }
@@ -242,6 +321,7 @@ struct ContentView: View {
 
             }
         }
+        .sensoryFeedback(.increase, trigger: alertMessage)
     }
 }
 
