@@ -199,6 +199,8 @@ struct ContentView: View {
                         )
                     }
 
+                    newTrails = newTrails.sorted(by: { !($0.isSelected && !$1.isSelected) })
+
                     guard let closestTrail = trailsSortedByClosestDistanceToTap.first else {
                         return
                     }
