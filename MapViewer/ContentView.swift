@@ -40,6 +40,9 @@ struct ContentView: View {
     @State
     var currentTapCoordinate: CLLocationCoordinate2D? = nil
 
+    @State
+    var showStatePeaks = false
+
     @Namespace
     var mapScope
 
@@ -51,6 +54,12 @@ struct ContentView: View {
                     selection: $selection,
                     scope: mapScope
                 ) {
+                    if showStatePeaks {
+                        ForEach(StatePeak.all) { peak in
+                            Marker("\(peak.name) (\(peak.elevationMeters) m)", coordinate: peak.coordinate)
+                        }
+                    }
+
                     ForEach(trails, id: \.id) { trail in
                         MapPolyline(coordinates: trail.coordinates)
                             .stroke(trail.isSelected ? .green.opacity(1.0) : .blue.opacity(1.0), lineWidth: 3)
@@ -262,6 +271,13 @@ struct ContentView: View {
 
                 Button("Add GPX", systemImage: "point.topleft.down.to.point.bottomright.curvepath.fill") {
                     shouldShowfileImporter = true
+                }
+
+                Button(
+                    showStatePeaks ? "Hide State Peaks" : "Show State Peaks",
+                    systemImage: showStatePeaks ? "mountain.2" : "mountain.2.fill"
+                ) {
+                    showStatePeaks.toggle()
                 }
             } label: {
                 Image(systemName: "gearshape.fill")
