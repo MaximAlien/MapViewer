@@ -20,5 +20,6 @@ An iOS app that I use to keep track of my hiking trails. Allows to import GPX tr
 
 <p float="left">
   <img src="screenshots/example_2.png" width="300" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="screenshots/example_1.png" width="300" />
 </p>
