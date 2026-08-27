@@ -1,10 +1,23 @@
 //
 //  StatePeak.swift
 //  MapViewer
-//
 
 import CoreLocation
 import Foundation
+
+enum ClimbStatus {
+    case none
+    case attempted
+    case climbed
+
+    var emoji: String {
+        switch self {
+        case .none:      return ""
+        case .attempted: return "🟡 "
+        case .climbed:   return "🟢 "
+        }
+    }
+}
 
 struct StatePeak: Identifiable {
 
@@ -18,12 +31,14 @@ struct StatePeak: Identifiable {
 
     let coordinate: CLLocationCoordinate2D
 
+    var status: ClimbStatus = .none
+
     static let all: [StatePeak] = [
         StatePeak(state: "Alabama",        name: "Cheaha Mountain",   elevationMeters: 734,  coordinate: CLLocationCoordinate2D(latitude: 33.4857, longitude: -85.8060)),
         StatePeak(state: "Alaska",         name: "Denali",            elevationMeters: 6194, coordinate: CLLocationCoordinate2D(latitude: 63.0695, longitude: -151.0074)),
-        StatePeak(state: "Arizona",        name: "Humphreys Peak",    elevationMeters: 3851, coordinate: CLLocationCoordinate2D(latitude: 35.3464, longitude: -111.6780)),
+        StatePeak(state: "Arizona",        name: "Humphreys Peak",    elevationMeters: 3851, coordinate: CLLocationCoordinate2D(latitude: 35.3464, longitude: -111.6780), status: .climbed),
         StatePeak(state: "Arkansas",       name: "Magazine Mountain", elevationMeters: 839,  coordinate: CLLocationCoordinate2D(latitude: 35.1670, longitude: -93.6446)),
-        StatePeak(state: "California",     name: "Mt. Whitney",       elevationMeters: 4421, coordinate: CLLocationCoordinate2D(latitude: 36.5785, longitude: -118.2923)),
+        StatePeak(state: "California",     name: "Mt. Whitney",       elevationMeters: 4421, coordinate: CLLocationCoordinate2D(latitude: 36.5785, longitude: -118.2923), status: .climbed),
         StatePeak(state: "Colorado",       name: "Mt. Elbert",        elevationMeters: 4399, coordinate: CLLocationCoordinate2D(latitude: 39.1178, longitude: -106.4453)),
         StatePeak(state: "Connecticut",    name: "Bear Mountain",     elevationMeters: 725,  coordinate: CLLocationCoordinate2D(latitude: 42.0012, longitude: -73.4457)),
         StatePeak(state: "Delaware",       name: "Ebright Azimuth",   elevationMeters: 137,  coordinate: CLLocationCoordinate2D(latitude: 39.8368, longitude: -75.5188)),
@@ -46,7 +61,7 @@ struct StatePeak: Identifiable {
         StatePeak(state: "Missouri",       name: "Taum Sauk Mountain",elevationMeters: 540,  coordinate: CLLocationCoordinate2D(latitude: 37.5706, longitude: -90.7274)),
         StatePeak(state: "Montana",        name: "Granite Peak",      elevationMeters: 3904, coordinate: CLLocationCoordinate2D(latitude: 45.1634, longitude: -109.8076)),
         StatePeak(state: "Nebraska",       name: "Panorama Point",    elevationMeters: 1653, coordinate: CLLocationCoordinate2D(latitude: 41.0069, longitude: -104.0306)),
-        StatePeak(state: "Nevada",         name: "Wheeler Peak",      elevationMeters: 3982, coordinate: CLLocationCoordinate2D(latitude: 38.9858, longitude: -114.3138)),
+        StatePeak(state: "Nevada",         name: "Wheeler Peak",      elevationMeters: 3982, coordinate: CLLocationCoordinate2D(latitude: 38.9858, longitude: -114.3138), status: .attempted),
         StatePeak(state: "New Hampshire",  name: "Mt. Washington",    elevationMeters: 1917, coordinate: CLLocationCoordinate2D(latitude: 44.2705, longitude: -71.3033)),
         StatePeak(state: "New Jersey",     name: "High Point",        elevationMeters: 550,  coordinate: CLLocationCoordinate2D(latitude: 41.3205, longitude: -74.6638)),
         StatePeak(state: "New Mexico",     name: "Wheeler Peak",      elevationMeters: 4013, coordinate: CLLocationCoordinate2D(latitude: 36.5569, longitude: -105.4170)),
@@ -61,7 +76,7 @@ struct StatePeak: Identifiable {
         StatePeak(state: "South Carolina", name: "Sassafras Mountain",elevationMeters: 1085, coordinate: CLLocationCoordinate2D(latitude: 35.0646, longitude: -82.7773)),
         StatePeak(state: "South Dakota",   name: "Black Elk Peak",    elevationMeters: 2207, coordinate: CLLocationCoordinate2D(latitude: 43.8661, longitude: -103.5322)),
         StatePeak(state: "Tennessee",      name: "Clingmans Dome",    elevationMeters: 2025, coordinate: CLLocationCoordinate2D(latitude: 35.5629, longitude: -83.4986)),
-        StatePeak(state: "Texas",          name: "Guadalupe Peak",    elevationMeters: 2667, coordinate: CLLocationCoordinate2D(latitude: 31.8912, longitude: -104.8606)),
+        StatePeak(state: "Texas",          name: "Guadalupe Peak",    elevationMeters: 2667, coordinate: CLLocationCoordinate2D(latitude: 31.8912, longitude: -104.8606), status: .climbed),
         StatePeak(state: "Utah",           name: "Kings Peak",        elevationMeters: 4123, coordinate: CLLocationCoordinate2D(latitude: 40.7763, longitude: -110.3729)),
         StatePeak(state: "Vermont",        name: "Mt. Mansfield",     elevationMeters: 1339, coordinate: CLLocationCoordinate2D(latitude: 44.5437, longitude: -72.8143)),
         StatePeak(state: "Virginia",       name: "Mt. Rogers",        elevationMeters: 1746, coordinate: CLLocationCoordinate2D(latitude: 36.6598, longitude: -81.5447)),

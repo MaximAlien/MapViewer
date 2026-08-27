@@ -56,7 +56,7 @@ struct ContentView: View {
                 ) {
                     if showStatePeaks {
                         ForEach(StatePeak.all) { peak in
-                            Marker("\(peak.name) (\(peak.elevationMeters) m)", coordinate: peak.coordinate)
+                            Marker("\(peak.status.emoji)\(peak.name) (\(peak.elevationMeters) m)", coordinate: peak.coordinate)
                         }
                     }
 
