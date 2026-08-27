@@ -43,6 +43,12 @@ struct ContentView: View {
     @State
     var showStatePeaks = false
 
+    @State
+    var showPeaksList = false
+
+    @StateObject
+    var peaksStore = PeaksStore()
+
     @Namespace
     var mapScope
 
@@ -55,7 +61,7 @@ struct ContentView: View {
                     scope: mapScope
                 ) {
                     if showStatePeaks {
-                        ForEach(StatePeak.all) { peak in
+                        ForEach(peaksStore.peaks) { peak in
                             Marker("\(peak.status.emoji)\(peak.name) (\(peak.elevationMeters) m)", coordinate: peak.coordinate)
                         }
                     }
@@ -273,11 +279,8 @@ struct ContentView: View {
                     shouldShowfileImporter = true
                 }
 
-                Button(
-                    showStatePeaks ? "Hide State Peaks" : "Show State Peaks",
-                    systemImage: showStatePeaks ? "mountain.2" : "mountain.2.fill"
-                ) {
-                    showStatePeaks.toggle()
+                Button("Highest State Peaks", systemImage: "mountain.2.fill") {
+                    showPeaksList = true
                 }
             } label: {
                 Image(systemName: "gearshape.fill")
@@ -340,6 +343,9 @@ struct ContentView: View {
             }
         }
         .sensoryFeedback(.increase, trigger: alertMessage)
+        .sheet(isPresented: $showPeaksList) {
+            StatePeaksListView(store: peaksStore, showOnMap: $showStatePeaks)
+        }
     }
 }
 

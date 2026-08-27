@@ -8,8 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		2E0DC77C2C34B21D004A05BA /* Trail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E0DC77B2C34B21D004A05BA /* Trail.swift */; };
-		2EAABBCD2C34B27D004A05BA /* StatePeak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAABBCC2C34B27D004A05BA /* StatePeak.swift */; };
 		2E0DC77F2C34B26D004A05BA /* CLLocationCoordinate2D.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E0DC77E2C34B26D004A05BA /* CLLocationCoordinate2D.swift */; };
+		2EAABBCD2C34B27D004A05BA /* StatePeak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAABBCC2C34B27D004A05BA /* StatePeak.swift */; };
+		2EAABBD12C34B290004A05BA /* PeaksStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAABBD02C34B290004A05BA /* PeaksStore.swift */; };
+		2EAABBD32C34B290004A05BA /* StatePeaksListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EAABBD22C34B290004A05BA /* StatePeaksListView.swift */; };
 		2EE1A1292AFD5835001A6375 /* MapViewerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE1A1282AFD5835001A6375 /* MapViewerApp.swift */; };
 		2EE1A12B2AFD5835001A6375 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE1A12A2AFD5835001A6375 /* ContentView.swift */; };
 		2EE1A12D2AFD5836001A6375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2EE1A12C2AFD5836001A6375 /* Assets.xcassets */; };
@@ -51,9 +53,11 @@
 
 /* Begin PBXFileReference section */
 		2E0DC77B2C34B21D004A05BA /* Trail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trail.swift; sourceTree = "<group>"; };
-		2EAABBCC2C34B27D004A05BA /* StatePeak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePeak.swift; sourceTree = "<group>"; };
 		2E0DC77E2C34B26D004A05BA /* CLLocationCoordinate2D.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CLLocationCoordinate2D.swift; sourceTree = "<group>"; };
 		2E1266172BFFCD5A004FB094 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		2EAABBCC2C34B27D004A05BA /* StatePeak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePeak.swift; sourceTree = "<group>"; };
+		2EAABBD02C34B290004A05BA /* PeaksStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeaksStore.swift; sourceTree = "<group>"; };
+		2EAABBD22C34B290004A05BA /* StatePeaksListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatePeaksListView.swift; sourceTree = "<group>"; };
 		2EE1A1252AFD5835001A6375 /* MapViewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MapViewer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2EE1A1282AFD5835001A6375 /* MapViewerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewerApp.swift; sourceTree = "<group>"; };
 		2EE1A12A2AFD5835001A6375 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -121,6 +125,8 @@
 				2E1266172BFFCD5A004FB094 /* Info.plist */,
 				2E0DC77B2C34B21D004A05BA /* Trail.swift */,
 				2EAABBCC2C34B27D004A05BA /* StatePeak.swift */,
+				2EAABBD02C34B290004A05BA /* PeaksStore.swift */,
+				2EAABBD22C34B290004A05BA /* StatePeaksListView.swift */,
 				2EE1A1542AFD6129001A6375 /* GPXParser.swift */,
 				2EE1A1592AFD71A8001A6375 /* LocationManager.swift */,
 				2EE1A1282AFD5835001A6375 /* MapViewerApp.swift */,
@@ -289,6 +295,8 @@
 				2EE1A15A2AFD71A8001A6375 /* LocationManager.swift in Sources */,
 				2E0DC77C2C34B21D004A05BA /* Trail.swift in Sources */,
 				2EAABBCD2C34B27D004A05BA /* StatePeak.swift in Sources */,
+				2EAABBD12C34B290004A05BA /* PeaksStore.swift in Sources */,
+				2EAABBD32C34B290004A05BA /* StatePeaksListView.swift in Sources */,
 				2EE1A12B2AFD5835001A6375 /* ContentView.swift in Sources */,
 				2EE1A1292AFD5835001A6375 /* MapViewerApp.swift in Sources */,
 				2EE1A1552AFD6129001A6375 /* GPXParser.swift in Sources */,
@@ -460,6 +468,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -496,6 +505,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
