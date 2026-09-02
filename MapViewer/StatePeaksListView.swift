@@ -62,7 +62,9 @@ struct StatePeaksListView: View {
                     .tint(.accentColor)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
+                    Button(role: .close) {
+                        dismiss()
+                    }
                 }
             }
         }
