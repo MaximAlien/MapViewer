@@ -46,6 +46,9 @@ struct ContentView: View {
     @State
     var showPeaksList = false
 
+    @State
+    var selectedTrail: Trail? = nil
+
     @StateObject
     var peaksStore = PeaksStore()
 
@@ -117,6 +120,7 @@ struct ContentView: View {
                                         Trail(
                                             name: url.lastPathComponent.replacing(".gpx", with: ""),
                                             coordinates: parser.coordinates,
+                                            elevations: parser.elevations,
                                             ranking: parser.ranking
                                         )
                                     )
@@ -208,6 +212,7 @@ struct ContentView: View {
                             Trail(
                                 name: trail.name,
                                 coordinates: trail.coordinates,
+                                elevations: trail.elevations,
                                 isSelected: trail.id == trailsSortedByClosestDistanceToTap.first?.id,
                                 ranking: trail.ranking
                             )
@@ -236,28 +241,9 @@ struct ContentView: View {
                         return
                     }
 
-                    shouldShowAlert = true
-
-                    let coordinatesOfClosestTrail = trailsSortedByClosestDistanceToTap.first?.coordinates ?? []
-                    let closestTrailDistance = zip(coordinatesOfClosestTrail.dropFirst(), coordinatesOfClosestTrail).map { (c, d) in
-                        let distance = CLLocation(
-                            latitude: c.latitude,
-                            longitude: c.longitude
-                        ).distance(
-                            from: CLLocation(
-                                latitude: d.latitude,
-                                longitude: d.longitude
-                            )
-                        )
-
-                        return distance
-                    }.reduce(0.0, +)
-
-                    let formattedDistance = String(format: "%.2f", closestTrailDistance / 1000.0)
-                    alertMessage = "Distance of \(closestTrail.name): \(formattedDistance) km"
-
                     currentTapCoordinate = tapLocation
                     trails = newTrails
+                    selectedTrail = closestTrail
 
                     let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light)
                     impactFeedbackGenerator.impactOccurred()
@@ -343,6 +329,12 @@ struct ContentView: View {
             }
         }
         .sensoryFeedback(.increase, trigger: alertMessage)
+        .sheet(item: $selectedTrail) { trail in
+            ElevationProfileView(trail: trail)
+                .presentationDetents([.height(320)])
+                .presentationBackground(.thinMaterial)
+                .interactiveDismissDisabled(false)
+        }
         .sheet(isPresented: $showPeaksList) {
             StatePeaksListView(store: peaksStore, showOnMap: $showStatePeaks)
         }

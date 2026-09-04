@@ -16,6 +16,8 @@ struct Trail: Identifiable, Codable {
 
     let coordinates: [CLLocationCoordinate2D]
 
+    let elevations: [Double]
+
     let isSelected: Bool
 
     let ranking: Int?
@@ -24,12 +26,14 @@ struct Trail: Identifiable, Codable {
         id: UUID = UUID(),
         name: String,
         coordinates: [CLLocationCoordinate2D],
+        elevations: [Double] = [],
         isSelected: Bool = false,
         ranking: Int? = nil
     ) {
         self.id = id
         self.name = name
         self.coordinates = coordinates
+        self.elevations = elevations
         self.isSelected = isSelected
         self.ranking = ranking
     }
@@ -39,6 +43,7 @@ struct Trail: Identifiable, Codable {
         try container.encode(id)
         try container.encode(name)
         try container.encode(coordinates)
+        try container.encode(elevations)
         try container.encode(isSelected)
         try container.encode(ranking)
     }
@@ -48,7 +53,8 @@ struct Trail: Identifiable, Codable {
         id = try container.decode(UUID.self)
         name = try container.decode(String.self)
         coordinates = try container.decode([CLLocationCoordinate2D].self)
-        isSelected = try container.decode(Bool.self)
-        ranking = try container.decodeIfPresent(Int.self)
+        elevations = (try? container.decode([Double].self)) ?? []
+        isSelected = (try? container.decode(Bool.self)) ?? false
+        ranking = try? container.decode(Int.self)
     }
 }

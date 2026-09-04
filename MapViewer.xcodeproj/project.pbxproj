@@ -25,6 +25,7 @@
 		2EE1A1572AFD66CC001A6375 /* GPXParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE1A1542AFD6129001A6375 /* GPXParser.swift */; };
 		2EE1A15A2AFD71A8001A6375 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE1A1592AFD71A8001A6375 /* LocationManager.swift */; };
 		2EE1A15B2AFD84FE001A6375 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EE1A1592AFD71A8001A6375 /* LocationManager.swift */; };
+		2E9ABC002C34B21D004A05BA /* ElevationProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E9ABC012C34B21D004A05BA /* ElevationProfileView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,6 +72,7 @@
 		2EE1A1492AFD588E001A6375 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2EE1A1542AFD6129001A6375 /* GPXParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPXParser.swift; sourceTree = "<group>"; };
 		2EE1A1592AFD71A8001A6375 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		2E9ABC012C34B21D004A05BA /* ElevationProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevationProfileView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,6 +133,7 @@
 				2EE1A1592AFD71A8001A6375 /* LocationManager.swift */,
 				2EE1A1282AFD5835001A6375 /* MapViewerApp.swift */,
 				2EE1A12A2AFD5835001A6375 /* ContentView.swift */,
+				2E9ABC012C34B21D004A05BA /* ElevationProfileView.swift */,
 				2EE1A12C2AFD5836001A6375 /* Assets.xcassets */,
 				2EE1A12E2AFD5836001A6375 /* Preview Content */,
 			);
@@ -301,6 +304,7 @@
 				2EE1A1292AFD5835001A6375 /* MapViewerApp.swift in Sources */,
 				2EE1A1552AFD6129001A6375 /* GPXParser.swift in Sources */,
 				2E0DC77F2C34B26D004A05BA /* CLLocationCoordinate2D.swift in Sources */,
+				2E9ABC002C34B21D004A05BA /* ElevationProfileView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
